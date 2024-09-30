@@ -5,11 +5,6 @@ from SpriteSheet import SpriteSheet
 
 # game window
 pygame.init()
-SCREEN_WIDTH = 1024
-SCREEN_HEIGHT = 512+32*4
-
-
-Scale = 8
 map = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 3, 3, 0],
@@ -53,6 +48,10 @@ map = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ]
 '''
+
+Scale = 8
+SCREEN_WIDTH = (len(map[0]) - 2) * 8 * Scale
+SCREEN_HEIGHT = (len(map) - 2) * 8 * Scale
 
 # Screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
@@ -132,15 +131,6 @@ class Tile():
         screen.blit(self.getTile(14, variation),(1 * 4 * Scale + xOffset, 3 * 4 * Scale + yOffset))
         screen.blit(self.getTile(15, variation),(2 * 4 * Scale + xOffset, 3 * 4 * Scale + yOffset))
         screen.blit(self.getTile(16, variation),(3 * 4 * Scale + xOffset, 3 * 4 * Scale + yOffset))
-'''
-tiles = [
-    0,
-    Tile(SpriteSheet("dirt_sb.png")),
-    Tile(SpriteSheet("thatch.png")),
-    Tile(SpriteSheet("slime.png")),
-    Tile(SpriteSheet("debug4.png"), 1),
-]
-'''
 
 tiles = [
     0,
@@ -211,7 +201,7 @@ def matchType(hexVal):
 
         case 0x20:  # Left Row
             return 11
-        case 0x120:  # Left Row
+        case 0x120:
             return 11
         case 0x420:
             return 12
@@ -221,8 +211,9 @@ def matchType(hexVal):
     return -1
 
 def drawMap():
-    highlightX = 3
-    highlightY = 2
+    DEBUG = False
+    highlightX = len(map[0]) - 2
+    highlightY = len(map) - 2
     tileOffset = 4 * Scale
 
     # Draw Block
@@ -232,10 +223,10 @@ def drawMap():
             xOffset = x * 8 * Scale - 8 * Scale
             if(map[y][x] != 0):
                 screen.blit(tiles[map[y][x]].getTile(4, tiles[map[y][x]].getRVar()),(xOffset, yOffset))
-            '''
-            if (x == highlightX and y == highlightY):
+
+            if (DEBUG and x == highlightX and y == highlightY):
                 screen.blit(tiles[4].getTile(4, 0),(xOffset, yOffset))
-            '''
+
 
             # Create Bitmap
             selection = 0x7EF
@@ -251,11 +242,11 @@ def drawMap():
             if (map[y + 1][x    ] <= map[y][x]): selection &= 0x7FD
             if (map[y + 1][x + 1] <= map[y][x]): selection &= 0x7FE
 
-            if (x == highlightX and y == highlightY):
-                print("Selection", '{:#05x}'.format(selection))
-                print("Top Left", x, y, '{:#05x}'.format(selection), '{:#05x}'.format(selection & 0x1B0))
-                print("Top Right", x, y, '{:#05x}'.format(selection), '{:#05x}'.format(selection & 0x2D8))
-                print("Bottom Left", x, y, '{:#05x}'.format(selection), '{:#05x}'.format(selection & 0x436))
+            if (DEBUG and x == highlightX and y == highlightY):
+                print("Selection"   ,       '{:#05x}'.format(selection))
+                print("Top Left"    , x, y, '{:#05x}'.format(selection), '{:#05x}'.format(selection & 0x1B0))
+                print("Top Right"   , x, y, '{:#05x}'.format(selection), '{:#05x}'.format(selection & 0x2D8))
+                print("Bottom Left" , x, y, '{:#05x}'.format(selection), '{:#05x}'.format(selection & 0x436))
                 print("Bottom Right", x, y, '{:#05x}'.format(selection), '{:#05x}'.format(selection & 0x61B))
 
             if(selection & 0x1FF == 0x0): continue # If no edges found continue
@@ -337,11 +328,6 @@ def drawMap():
                     temp,
                     tileOffset, tileOffset
                 )
-
-
-
-
-
 
 run = True
 
